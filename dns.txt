@@ -1,2 +1,5 @@
-www.uvsq.fr 193.51.31.90
-ecampus.uvsq.fr 193.51.25.12
+193.51.31.90 www.uvsq.fr
+193.51.25.12 ecampus.uvsq.fr
+193.51.31.154 poste.uvsq.fr
+142.250.190.4 www.google.com
+157.240.22.35 www.facebook.com

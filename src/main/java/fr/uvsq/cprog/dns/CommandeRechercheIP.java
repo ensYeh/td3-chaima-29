@@ -1,8 +1,5 @@
 package fr.uvsq.cprog.dns;
 
-/**
- * Commande pour rechercher une adresse IP à partir d’un nom de machine.
- */
 public class CommandeRechercheIP implements Commande {
     private final Dns dns;
     private final NomMachine nom;
@@ -15,7 +12,14 @@ public class CommandeRechercheIP implements Commande {
     @Override
     public String execute() {
         DnsItem item = dns.getItem(nom);
-        return (item != null) ? item.getAdresse().toString()
-                : "Nom de machine inconnu : " + nom;
+        String msg;
+        if (item != null) {
+            msg = item.getAdresse().toString();
+        } else {
+            msg = "Nom de machine inconnu : " + nom;
+        }
+        System.out.println(msg);
+        return msg;
     }
 }
+

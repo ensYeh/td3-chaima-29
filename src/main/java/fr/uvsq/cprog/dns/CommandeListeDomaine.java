@@ -1,11 +1,7 @@
 package fr.uvsq.cprog.dns;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-/**
- * Commande pour lister les machines d’un domaine.
- */
 public class CommandeListeDomaine implements Commande {
     private final Dns dns;
     private final String domaine;
@@ -21,10 +17,17 @@ public class CommandeListeDomaine implements Commande {
     public String execute() {
         List<DnsItem> items = dns.getItems(domaine, parAdresse);
         if (items.isEmpty()) {
-            return "Aucune machine trouvée pour le domaine " + domaine;
+            String msg = "Aucune machine trouvée pour le domaine : " + domaine;
+            System.out.println(msg);
+            return msg;
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (DnsItem item : items) {
+                sb.append(item.getAdresse()).append(" ").append(item.getNom()).append("\n");
+            }
+            String result = sb.toString().trim();
+            System.out.println(result);
+            return result;
         }
-        return items.stream()
-                .map(DnsItem::toString)
-                .collect(Collectors.joining("\n"));
     }
 }

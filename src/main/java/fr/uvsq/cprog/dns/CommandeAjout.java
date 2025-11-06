@@ -1,8 +1,5 @@
 package fr.uvsq.cprog.dns;
 
-/**
- * Commande pour ajouter une nouvelle entrée dans la base DNS.
- */
 public class CommandeAjout implements Commande {
     private final Dns dns;
     private final AdresseIP adresse;
@@ -18,11 +15,13 @@ public class CommandeAjout implements Commande {
     public String execute() {
         try {
             dns.addItem(adresse, nom);
-            return "Ajout réussi : " + adresse + " → " + nom;
+            String msg = "Ajout réussi : " + adresse + " → " + nom;
+            System.out.println(msg);
+            return msg;
         } catch (IllegalArgumentException e) {
-            return "ERREUR : " + e.getMessage();
-        } catch (java.io.IOException e) {
-            return "Erreur d'accès au fichier : " + e.getMessage();
+            String msg = "Erreur : " + e.getMessage();
+            System.out.println(msg);
+            return msg;
         }
     }
 }

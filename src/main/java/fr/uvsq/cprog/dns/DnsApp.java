@@ -1,6 +1,6 @@
 package fr.uvsq.cprog.dns;
 
-import java.io.IOException;
+import java.util.Scanner;
 
 /**
  * Classe principale de l'application DNS.
@@ -8,38 +8,70 @@ import java.io.IOException;
 public class DnsApp {
 
     public static void main(String[] args) {
-        try {
-            // Chemin du fichier contenant la base de données DNS
-            String fichierDns = "dns.txt";
+        Dns dns = new Dns("dns.txt");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("=======================");
+        System.out.println("     DNS Console");
+        System.out.println("=======================");
 
-            // Chargement de la base DNS
-            Dns dns = new Dns(fichierDns);
+        while (true) {
+            System.out.print("> ");
+            String ligne = scanner.nextLine().trim();
 
-            // Interface utilisateur
-            DnsTUI tui = new DnsTUI(dns);
-
-            System.out.println("=== Simulation DNS ===");
-            System.out.println("Commandes disponibles :");
-            System.out.println("  [nom.qualifie] → affiche l'adresse IP");
-            System.out.println("  [adr.es.se.ip] → affiche le nom de la machine");
-            System.out.println("  ls [-a] domaine → liste les machines du domaine");
-            System.out.println("  add ip nom → ajoute une machine");
-            System.out.println("  quit → quitte le programme");
-            System.out.println("=======================");
-
-            // Boucle principale
-            while (true) {
-                Commande cmd = tui.nextCommande();
-                if (cmd != null) {
-                    String resultat = cmd.execute();
-                    if (resultat != null && !resultat.isBlank()) {
-                        tui.affiche(resultat);
-                    }
-                }
+            if (ligne.isEmpty()) {
+                System.out.println("Commande inconnue !");
+                continue;
             }
 
-        } catch (IOException e) {
-            System.err.println("Erreur lors du chargement de la base DNS : " + e.getMessage());
+            // Commande pour quitter
+            if (ligne.equalsIgnoreCase("quit") || ligne.equalsIgnoreCase("exit")) {
+                new CommandeQuitter().execute();
+            }
+
+            // Commande pour ajouter une machine
+            if (ligne.startsWith("add ")) {
+                String[] parties = ligne.split("\\s+");
+                if (parties.length != 3) {
+                    System.out.println("Usage : add <adresseIP> <nomMachine>");
+                    continue;
+                }
+                try {
+                    AdresseIP ip = new AdresseIP(parties[1]);
+                    NomMachine nom = new NomMachine(parties[2]);
+                    new CommandeAjout(dns, ip, nom).execute();
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Erreur : " + e.getMessage());
+                }
+                continue;
+            }
+
+            // Commande pour lister les domaines
+            if (ligne.startsWith("ls ")) {
+                String[] parties = ligne.split("\\s+");
+                if (parties.length != 3) {
+                    System.out.println("Usage : ls <-a|-n> <domaine>");
+                    continue;
+                }
+                boolean parAdresse = parties[1].equals("-a");
+                new CommandeListeDomaine(dns, parties[2], parAdresse).execute();
+                continue;
+            }
+
+            // Commande de recherche
+            try {
+                if (ligne.matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
+                    // Si c’est une adresse IP
+                    AdresseIP ip = new AdresseIP(ligne);
+                    new CommandeRechercheNom(dns, ip).execute();
+                } else {
+                    // Sinon c’est un nom de machine
+                    NomMachine nom = new NomMachine(ligne);
+                    new CommandeRechercheIP(dns, nom).execute();
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println("Commande inconnue !");
+            }
         }
     }
 }
+
