@@ -1,0 +1,2 @@
+www.uvsq.fr 193.51.31.90
+ecampus.uvsq.fr 193.51.25.12
